@@ -6,10 +6,10 @@ WORKDIR="/tmp/acme" #工作目录，默认为/tmp/acme
 # Variables corresponding to the deployment type
 # 以下为自动安装证书的目的地设置
 # manual
-manual_cert_file=""
-manual_key_file=""
-manual_fullchain_file=""
-#manual_reloadcmd="" # To execute commands after updating the certificate, uncomment and configure the content yourself 若要更新证书后执行命令，请取消注释并自行配置内容
+#manual_cert_file=""
+manual_key_file="/etc/XrayR/cert/privkey.pem"
+manual_fullchain_file="/etc/XrayR/cert/fullchain.pem"
+manual_reloadcmd="xrayr restart" # To execute commands after updating the certificate, uncomment and configure the content yourself 若要更新证书后执行命令，请取消注释并自行配置内容
 
 # apache
 apache_cert_file=""
@@ -79,7 +79,7 @@ checkUpdate(){
   fi
   mv -f "${WORKDIR}/${domain}/temp" "${WORKDIR}/${domain}/timestamp.tmp" #将刚对比的时间戳临时保存
 
-  for file_name_d in "cert.pem" "key.pem" "fullchain.pem"
+  for file_name_d in "privkey.pem" "fullchain.pem"
   do
     echo "下载文件名：${file_name_d}"
     requestServer "${server}" "${file_name_d}" #向服务端请求服务端更新时间戳
@@ -111,12 +111,11 @@ deployCert(){
   # manual
   elif [ "$1" = "m" ]; then
     if $DEBUG; then echo "deploy_type:manual"; fi
-    if [ -z "$manual_cert_file" ] || [ -z "$manual_key_file" ] || [ -z "$manual_fullchain_file" ]; then
+    if  [ -z "$manual_key_file" ] || [ -z "$manual_fullchain_file" ]; then
       echo "未配置证书目的地变量"
       exit 1
     fi
-    cp -f "${WORKDIR}/${domain}/cert.pem" "$manual_cert_file"
-    cp -f "${WORKDIR}/${domain}/key.pem" "$manual_key_file"
+    cp -f "${WORKDIR}/${domain}/privkey.pem" "$manual_key_file"
     cp -f "${WORKDIR}/${domain}/fullchain.pem" "$manual_fullchain_file"
     if [ -n "$manual_reloadcmd" ]; then
       cd "${WORKDIR}/${domain}" && eval "$manual_reloadcmd"
@@ -129,8 +128,7 @@ deployCert(){
       echo "未配置证书目的地变量"
       exit 1
     fi
-    cp -f "${WORKDIR}/${domain}/cert.pem" "$apache_cert_file"
-    cp -f "${WORKDIR}/${domain}/key.pem" "$apache_key_file"
+    cp -f "${WORKDIR}/${domain}/privkey.pem" "$apache_key_file"
     cp -f "${WORKDIR}/${domain}/fullchain.pem" "$apache_fullchain_file"
     if [ -n "$apache_reloadcmd" ]; then
       cd "${WORKDIR}/${domain}" && eval "$apache_reloadcmd"
@@ -143,8 +141,7 @@ deployCert(){
       echo "未配置证书目的地变量"
       exit 1
     fi
-    cp -f "${WORKDIR}/${domain}/cert.pem" "$nginx_cert_file"
-    cp -f "${WORKDIR}/${domain}/key.pem" "$nginx_key_file"
+    cp -f "${WORKDIR}/${domain}/privkey.pem" "$nginx_key_file"
     if [ -n "$nginx_reloadcmd" ]; then
       cd "${WORKDIR}/${domain}" && eval "$nginx_reloadcmd"
     fi
