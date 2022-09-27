@@ -9,7 +9,7 @@ WORKDIR="/tmp/acme" #工作目录，默认为/tmp/acme
 #manual_cert_file=""
 manual_key_file="/etc/XrayR/cert/privkey.pem"
 manual_fullchain_file="/etc/XrayR/cert/fullchain.pem"
-manual_reloadcmd="xrayr restart" # To execute commands after updating the certificate, uncomment and configure the content yourself 若要更新证书后执行命令，请取消注释并自行配置内容
+manual_reloadcmd="XrayR restart" # To execute commands after updating the certificate, uncomment and configure the content yourself 若要更新证书后执行命令，请取消注释并自行配置内容
 
 # apache
 apache_cert_file=""
